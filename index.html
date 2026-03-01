@@ -1,7 +1,7 @@
 <?php
 /* ---------------------------------------------------------
-   TASK: DB Connection
-   Description: Implement the database connection logic.
+   TASK: DB Connection (Finalized)
+   Description: Implement the database connection logic using ecpi_user.
    --------------------------------------------------------- */
 $host = 'localhost';
 $db   = 'sdc310_midterm'; 
@@ -18,7 +18,6 @@ if ($conn->connect_error) {
    Description: Implement forms and logic to add new addresses.
    --------------------------------------------------------- */
 if (isset($_POST['add'])) {
-    // Collect and sanitize input
     $first = $conn->real_escape_string($_POST['first']);
     $last = $conn->real_escape_string($_POST['last']);
     $street = $conn->real_escape_string($_POST['street']);
@@ -33,7 +32,7 @@ if (isset($_POST['add'])) {
 
 /* ---------------------------------------------------------
    TASK: Delete Logic
-   Description: Handles record removal based on ID.
+   Description: Provides the ability to Delete existing addresses.
    --------------------------------------------------------- */
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
@@ -43,17 +42,26 @@ if (isset($_GET['delete'])) {
 }
 
 /* ---------------------------------------------------------
-   TASK: Read/Display
-   Description: Query the database to display all addresses.
+   TASK: Functional Test & Read/Display
+   Description: Query the database with Search support for UI/UX Polish.
    --------------------------------------------------------- */
-$result = $conn->query("SELECT * FROM addresses");
+$search = "";
+$query = "SELECT * FROM addresses";
+
+if (isset($_GET['search_query']) && !empty($_GET['search_query'])) {
+    $search = $conn->real_escape_string($_GET['search_query']);
+    // Filter by Name or City
+    $query = "SELECT * FROM addresses WHERE First LIKE '%$search%' OR Last LIKE '%$search%' OR City LIKE '%$search%'";
+}
+
+$result = $conn->query($query);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Victory Lane - Performance Assessment</title>
+    <title>Victory Lane - Broc Salvati Final Project</title>
     <style>
         :root {
             --speed-red: #D31225;
@@ -92,6 +100,19 @@ $result = $conn->query("SELECT * FROM addresses");
 
         .task-label { color: var(--speed-red); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
 
+        /* Search Bar Polish */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .search-input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+
         form { background: #e9ecef; padding: 20px; border-radius: 5px; margin-bottom: 30px; border-left: 5px solid var(--speed-red); }
         input { margin-bottom: 10px; display: block; width: 95%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
         
@@ -103,10 +124,10 @@ $result = $conn->query("SELECT * FROM addresses");
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.2s;
         }
 
         button:hover { background-color: var(--speed-red); }
+        .btn-clear { background-color: #6c757d; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
@@ -114,40 +135,48 @@ $result = $conn->query("SELECT * FROM addresses");
         tr:nth-child(even) { background-color: #f9f9f9; }
 
         .btn-delete { color: var(--speed-red); text-decoration: none; font-weight: bold; }
-        .btn-delete:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <nav>
         <h1>Victory Lane</h1>
-        <div>Performance Assessment</div>
+        <div>Broc Salvati - Final Project</div>
     </nav>
 
     <div class="container">
-        <div class="task-label">Project: Broc Salvati</div>
-        <h2>Address Management System</h2>
+        [cite_start]<div class="task-label">Project Status: Finalizing the Application</div> [cite: 251]
+        <h2>Pit Crew Address Manager</h2>
 
+        [cite_start][cite: 259]
+        <form method="GET" action="index.php" class="search-box">
+            <input type="text" name="search_query" class="search-input" placeholder="Search by name or city..." value="<?= htmlspecialchars($search) ?>">
+            <button type="submit">Search</button>
+            <?php if (!empty($search)): ?>
+                <button type="button" class="btn-clear" onclick="window.location.href='index.php'">Clear</button>
+            <?php endif; ?>
+        </form>
+
+        [cite_start][cite: 215]
         <form method="POST" action="index.php">
-            <div class="task-label">Task: Create Logic</div>
-            <h3>Add New Pit Crew Address</h3>
+            [cite_start]<div class="task-label">Task: Code Cleanup</div> [cite: 259]
+            <h3>Add New Pit Crew Entry</h3>
             <input type="text" name="first" placeholder="First Name" required maxlength="25">
             <input type="text" name="last" placeholder="Last Name" required maxlength="30">
             <input type="text" name="street" placeholder="Street Address" required maxlength="100">
             <input type="text" name="city" placeholder="City" required maxlength="25">
-            <input type="text" name="state" placeholder="ST (State)" required maxlength="2">
+            <input type="text" name="state" placeholder="State (e.g. VA)" required maxlength="2">
             <input type="text" name="zip" placeholder="Zip Code" required maxlength="10">
-            <button type="submit" name="add">Add to Database</button>
+            <button type="submit" name="add">Add Record</button>
         </form>
 
-        <div class="task-label">Task: Read/Display</div>
-        <h3>Registered Addresses</h3>
+        [cite_start][cite: 215]
+        <h3>Current Database Records</h3>
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
-                    <th>Full Address</th>
+                    <th>Address</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -155,16 +184,15 @@ $result = $conn->query("SELECT * FROM addresses");
                 <?php if ($result && $result->num_rows > 0): ?>
                     <?php while($row = $result->fetch_assoc()): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($row['AddressNo']); ?></td>
-                        <td><?php echo htmlspecialchars($row['First'] . " " . $row['Last']); ?></td>
-                        <td><?php echo htmlspecialchars($row['Street'] . ", " . $row['City'] . " " . $row['State'] . " " . $row['Zip']); ?></td>
+                        <td><?= htmlspecialchars($row['First'] . " " . $row['Last']) ?></td>
+                        <td><?= htmlspecialchars($row['Street'] . ", " . $row['City'] . " " . $row['State'] . " " . $row['Zip']) ?></td>
                         <td>
-                            <a href="?delete=<?php echo $row['AddressNo']; ?>" class="btn-delete" onclick="return confirm('Remove this record?')">Delete</a>
+                            <a href="?delete=<?= $row['AddressNo'] ?>" class="btn-delete" onclick="return confirm('Delete this record?')">Delete</a>
                         </td>
                     </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <tr><td colspan="4" style="text-align:center;">No records found in pit lane.</td></tr>
+                    <tr><td colspan="3" style="text-align:center;">No records found.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
