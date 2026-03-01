@@ -1,7 +1,6 @@
 <?php
 /* ---------------------------------------------------------
-   TASK: DB Connection (Finalized)
-   Description: Implement the database connection logic using ecpi_user.
+   TASK: DB Connection (ecpi_user)
    --------------------------------------------------------- */
 $host = 'localhost';
 $db   = 'sdc310_midterm'; 
@@ -14,8 +13,7 @@ if ($conn->connect_error) {
 }
 
 /* ---------------------------------------------------------
-   TASK: Create Logic
-   Description: Implement forms and logic to add new addresses.
+   TASK: Create Logic (Add Record)
    --------------------------------------------------------- */
 if (isset($_POST['add'])) {
     $first = $conn->real_escape_string($_POST['first']);
@@ -32,7 +30,6 @@ if (isset($_POST['add'])) {
 
 /* ---------------------------------------------------------
    TASK: Delete Logic
-   Description: Provides the ability to Delete existing addresses.
    --------------------------------------------------------- */
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
@@ -42,18 +39,14 @@ if (isset($_GET['delete'])) {
 }
 
 /* ---------------------------------------------------------
-   TASK: Functional Test & Read/Display
-   Description: Query the database with Search support for UI/UX Polish.
+   TASK: Functional Test & Read/Display (with Search)
    --------------------------------------------------------- */
 $search = "";
 $query = "SELECT * FROM addresses";
-
 if (isset($_GET['search_query']) && !empty($_GET['search_query'])) {
     $search = $conn->real_escape_string($_GET['search_query']);
-    // Filter by Name or City
     $query = "SELECT * FROM addresses WHERE First LIKE '%$search%' OR Last LIKE '%$search%' OR City LIKE '%$search%'";
 }
-
 $result = $conn->query($query);
 ?>
 
@@ -61,134 +54,51 @@ $result = $conn->query($query);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Victory Lane - Broc Salvati Final Project</title>
+    <title>Victory Lane - Broc Salvati Final</title>
     <style>
-        :root {
-            --speed-red: #D31225;
-            --asphalt: #222222;
-            --checker-white: #f4f4f4;
-            --gold: #FFD700;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: var(--checker-white);
-            color: var(--asphalt);
-        }
-
-        nav {
-            background-color: var(--asphalt);
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 4px solid var(--speed-red);
-        }
-
-        h1 { margin: 0; font-style: italic; text-transform: uppercase; letter-spacing: 2px; }
-
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
-
-        .task-label { color: var(--speed-red); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-
-        /* Search Bar Polish */
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .search-input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-
-        form { background: #e9ecef; padding: 20px; border-radius: 5px; margin-bottom: 30px; border-left: 5px solid var(--speed-red); }
+        :root { --speed-red: #D31225; --asphalt: #222222; --checker-white: #f4f4f4; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: var(--checker-white); }
+        nav { background-color: var(--asphalt); color: white; padding: 1rem 2rem; border-bottom: 4px solid var(--speed-red); display: flex; justify-content: space-between; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        form { background: #e9ecef; padding: 20px; border-radius: 5px; margin-bottom: 20px; border-left: 5px solid var(--speed-red); }
         input { margin-bottom: 10px; display: block; width: 95%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        
-        button {
-            background-color: var(--asphalt);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
+        button { background-color: var(--asphalt); color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background-color: var(--speed-red); }
-        .btn-clear { background-color: #6c757d; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background-color: var(--asphalt); color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-
         .btn-delete { color: var(--speed-red); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
-
-    <nav>
-        <h1>Victory Lane</h1>
-        <div>Broc Salvati - Final Project</div>
-    </nav>
-
+    <nav><h1>Victory Lane</h1><div>Broc Salvati - Final Project</div></nav>
     <div class="container">
-        [cite_start]<div class="task-label">Project Status: Finalizing the Application</div> [cite: 251]
-        <h2>Pit Crew Address Manager</h2>
-
-        [cite_start][cite: 259]
-        <form method="GET" action="index.php" class="search-box">
-            <input type="text" name="search_query" class="search-input" placeholder="Search by name or city..." value="<?= htmlspecialchars($search) ?>">
+        <form method="GET" style="display:flex; gap:10px; background:none; border:none; padding:0;">
+            <input type="text" name="search_query" placeholder="Search name or city..." value="<?= htmlspecialchars($search) ?>" style="flex-grow:1;">
             <button type="submit">Search</button>
-            <?php if (!empty($search)): ?>
-                <button type="button" class="btn-clear" onclick="window.location.href='index.php'">Clear</button>
-            <?php endif; ?>
+            <?php if($search): ?><button type="button" onclick="window.location.href='index.php'">Clear</button><?php endif; ?>
         </form>
 
-        [cite_start][cite: 215]
-        <form method="POST" action="index.php">
-            [cite_start]<div class="task-label">Task: Code Cleanup</div> [cite: 259]
+        <form method="POST">
             <h3>Add New Pit Crew Entry</h3>
             <input type="text" name="first" placeholder="First Name" required maxlength="25">
             <input type="text" name="last" placeholder="Last Name" required maxlength="30">
-            <input type="text" name="street" placeholder="Street Address" required maxlength="100">
+            <input type="text" name="street" placeholder="Street" required maxlength="100">
             <input type="text" name="city" placeholder="City" required maxlength="25">
-            <input type="text" name="state" placeholder="State (e.g. VA)" required maxlength="2">
-            <input type="text" name="zip" placeholder="Zip Code" required maxlength="10">
+            <input type="text" name="state" placeholder="ST" required maxlength="2">
+            <input type="text" name="zip" placeholder="Zip" required maxlength="10">
             <button type="submit" name="add">Add Record</button>
         </form>
 
-        [cite_start][cite: 215]
-        <h3>Current Database Records</h3>
         <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Address</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Name</th><th>Address</th><th>Actions</th></tr></thead>
             <tbody>
-                <?php if ($result && $result->num_rows > 0): ?>
+                <?php if ($result->num_rows > 0): ?>
                     <?php while($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?= htmlspecialchars($row['First'] . " " . $row['Last']) ?></td>
                         <td><?= htmlspecialchars($row['Street'] . ", " . $row['City'] . " " . $row['State'] . " " . $row['Zip']) ?></td>
-                        <td>
-                            <a href="?delete=<?= $row['AddressNo'] ?>" class="btn-delete" onclick="return confirm('Delete this record?')">Delete</a>
-                        </td>
+                        <td><a href="?delete=<?= $row['AddressNo'] ?>" class="btn-delete" onclick="return confirm('Delete record?')">Delete</a></td>
                     </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
@@ -197,6 +107,5 @@ $result = $conn->query($query);
             </tbody>
         </table>
     </div>
-
 </body>
 </html>
