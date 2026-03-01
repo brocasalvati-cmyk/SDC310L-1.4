@@ -1,52 +1,23 @@
-/********************************************************
-* Script: Salvati_Create_Read.sql
-* Description: Creates the database schema for the NASCAR
-* Store application and populates it with 
-* initial seed data matching the web catalog.
-*********************************************************/
+-- Create Database
+CREATE DATABASE IF NOT EXISTS sdc310_midterm;
+USE sdc310_midterm;
 
-/* 1. Create and Use the Database */
-CREATE DATABASE IF NOT EXISTS VictoryLaneStore;
-USE VictoryLaneStore;
-
-/* 2. Drop tables if they exist (to allow clean re-runs) */
-DROP TABLE IF EXISTS Products;
-DROP TABLE IF EXISTS Users;
-
-/* 3. Create Users Table */
-CREATE TABLE Users (
-    UserID INT AUTO_INCREMENT PRIMARY KEY,
-    UserName VARCHAR(50) NOT NULL,
-    UserPassword VARCHAR(50) NOT NULL, /* In production, store hashes, not plain text */
-    Email VARCHAR(100) NOT NULL,
-    DateCreated DATETIME DEFAULT CURRENT_TIMESTAMP
+-- Create Table with required character lengths
+CREATE TABLE IF NOT EXISTS addresses (
+    AddressNo INT AUTO_INCREMENT PRIMARY KEY,
+    First VARCHAR(25) NOT NULL,
+    Last VARCHAR(30) NOT NULL,
+    Street VARCHAR(100) NOT NULL,
+    City VARCHAR(25) NOT NULL,
+    State VARCHAR(2) NOT NULL,
+    Zip VARCHAR(10) NOT NULL
 );
 
-/* 4. Create Products Table */
-/* Note: Using VARCHAR for ProductID to accommodate 'NAS-xxx' format */
-CREATE TABLE Products (
-    ProductID VARCHAR(20) PRIMARY KEY, 
-    ProductName VARCHAR(100) NOT NULL,
-    ProductDescription VARCHAR(255),
-    ProductCost DECIMAL(10, 2) NOT NULL,
-    QuantityInStock INT DEFAULT 50 /* Default inventory level */
-);
+-- Permissions for ecpi_user
+GRANT ALL PRIVILEGES ON sdc310_midterm.* TO 'ecpi_user'@'localhost' IDENTIFIED BY 'password123';
+FLUSH PRIVILEGES;
 
-/* 5. INSERT Data: Users */
-INSERT INTO Users (UserName, UserPassword, Email) VALUES
-('SpeedDemon', 'TurnLeft2024!', 'racer@example.com'),
-('PitCrewChief', 'LugNuts@5', 'chief@example.com'),
-('FanOne', 'NASCAR_Rules', 'fan@example.com');
-
-/* 6. INSERT Data: Products */
-/* These values match the JavaScript object array from the web application */
-INSERT INTO Products (ProductID, ProductName, ProductDescription, ProductCost) VALUES
-('NAS-001', '1:24 Diecast Stock Car', 'High-detail collectible replica of the championship winning #1 car.', 69.99),
-('NAS-002', 'Checkered Flag (Official Size)', 'Authentic polyester 3x5 checkered flag.', 24.50),
-('NAS-003', 'Pit Crew Fire Suit Jacket', 'Replica pit crew jacket with embroidered sponsor patches.', 129.99),
-('NAS-004', 'Race Scanner Headset', 'Noise-canceling headset to listen to driver-crew communications.', 89.95),
-('NAS-005', 'Used Race Rubber (Fragment)', 'Encased piece of actual tire rubber scraped off the track.', 14.99);
-
-/* 7. READ Data: Verify the inserts */
-SELECT * FROM Users;
-SELECT * FROM Products;
+-- Initial Records (Task: SQL Implementation)
+INSERT INTO addresses (First, Last, Street, City, State, Zip) 
+VALUES ('Broc', 'Salvati', '123 Victory Lane', 'Suffolk', 'VA', '23434'),
+       ('Jane', 'Doe', '456 Raceway Blvd', 'Charlotte', 'NC', '28202');
